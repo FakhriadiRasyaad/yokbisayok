@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import logo from '../assets/standby.png'; 
+import Image from 'next/image';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false); // State to manage the hamburger menu
@@ -13,7 +14,7 @@ const Navbar: React.FC = () => {
     <nav className="bg-[#630000] p-4 flex justify-between items-center">
       {/* Left side: Clickable Logo and StandBy text */}
       <Link href="/home" className="flex items-center">
-        <img 
+        <Image
           src={logo.src} 
           alt="StandBy Logo" 
           className="h-8 w-8 mr-2" 

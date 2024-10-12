@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import supabase from '../../components/SupabaseClient';
 import Navbar from '../../components/navbar';
 import Footer from '../../components/footer';
+import Image from 'next/image';
 
 const SettingsPage = () => {
   const [fullName, setFullName] = useState('');
@@ -70,7 +71,7 @@ const SettingsPage = () => {
     return signedUrlData.signedUrl;
   };
 
-  // Function to update the avatar of a user
+  
   const handleUpdateAvatar = async () => {
     const { data: { user }, error } = await supabase.auth.getUser();
     
@@ -78,7 +79,7 @@ const SettingsPage = () => {
       setError('User not found or not authenticated');
       return;
     }
-
+  
     if (newAvatar) {
       try {
         const newAvatarUrl = await uploadAvatar(newAvatar);
@@ -97,12 +98,19 @@ const SettingsPage = () => {
         }
       } catch (err) {
         console.error('Error in handleUpdateAvatar:', err);
-        setError(err.message);
+        // Check if err is an instance of Error
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          // Handle unexpected error types
+          setError('An unexpected error occurred');
+        }
       }
     } else {
       setError('No avatar file selected.');
     }
   };
+  
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
@@ -113,7 +121,7 @@ const SettingsPage = () => {
         
         {/* Avatar */}
         {avatar && (
-          <img 
+          <Image
             src={avatar} 
             alt="Avatar" 
             className="h-36 w-36 rounded-full mb-6 border-2 border-gray-300 shadow-md" 

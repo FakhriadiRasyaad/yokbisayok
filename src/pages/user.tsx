@@ -5,10 +5,20 @@ import { useRouter } from 'next/navigation';
 import supabase from '../components/SupabaseClient';
 import Navbar from '../components/navbar';
 import Footer from '../components/footer';
-import AddUserIcon from '../assets/add.png'; // Import the add user image
+import AddUserIcon from '../assets/add.png';
+import Image from 'next/image';
+
+// Definisikan tipe User
+type User = {
+  id: string;
+  full_name: string;
+  email: string;
+  avatar_url: string | null;
+  is_admin: boolean;
+};
 
 const UserPage = () => {
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<User[]>([]); // Gunakan tipe User
   const [error, setError] = useState('');
   const [isCurrentUserAdmin, setIsCurrentUserAdmin] = useState(false);
   const router = useRouter();
@@ -26,7 +36,9 @@ const UserPage = () => {
           .eq('id', user.id)
           .single();
 
-        setIsCurrentUserAdmin(data.is_admin);
+        if (data && data.is_admin !== undefined) {
+          setIsCurrentUserAdmin(data.is_admin); // Cek data sebelum akses
+        }
       }
     };
 
@@ -42,7 +54,7 @@ const UserPage = () => {
     if (error) {
       setError('Error fetching users');
     } else {
-      setUsers(data || []);
+      setUsers(data || []); // Gunakan data atau array kosong
     }
   };
 
@@ -73,7 +85,7 @@ const UserPage = () => {
                     <tr key={index} className="hover:bg-gray-100 transition duration-200">
                       <td className="border px-4 py-2">
                         {user.avatar_url ? (
-                          <img
+                          <Image
                             src={user.avatar_url}
                             alt="avatar"
                             className="w-12 h-12 rounded-full"
@@ -100,13 +112,13 @@ const UserPage = () => {
             <button
               onClick={handleAdminButtonClick}
               className="bg-blue-500 text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg hover:bg-blue-600 transition duration-300 transform hover:scale-105">
-              <img src={AddUserIcon.src} alt="Add User" className="w-10 h-10" /> {/* Use the imported image */}
+              <Image src={AddUserIcon.src} alt="Add User" className="w-10 h-10" />
             </button>
           </div>
         )}
-        <div className="mt-20"> {/* Margin above the footer */}
-        <Footer />
-      </div>
+        <div className="mt-20">
+          <Footer />
+        </div>
       </div>
     </div>
   );

@@ -4,8 +4,18 @@ import Navbar from '../components/navbar';
 import Footer from '../components/footer';
 import Botpress from '../components/botpress';
 
+// Definisikan tipe untuk data ESP32
+interface Esp32Data {
+  id: number;
+  created_at: string;
+  ds18b20_temp: number;
+  dht22_temp: number;
+  dht22_humi: number;
+  fan_status: string;
+}
+
 const Esp32Dashboard: React.FC = () => {
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<Esp32Data[]>([]); // Ubah dari any[] ke Esp32Data[]
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -19,15 +29,22 @@ const Esp32Dashboard: React.FC = () => {
 
         if (error) throw error;
 
-        setData(esp32Data);
-      } catch (error: any) {
-        console.error('Error fetching data:', error.message);
-        setError('Failed to fetch data: ' + error.message);
+        setData(esp32Data as Esp32Data[]);
+      } catch (error: unknown) {
+        // Periksa apakah error adalah objek dan memiliki properti 'message'
+        if (error instanceof Error) {
+          console.error('Error fetching data:', error.message);
+          setError('Failed to fetch data: ' + error.message);
+        } else {
+          // Jika error bukan instance dari Error, gunakan pesan default
+          console.error('Unknown error fetching data');
+          setError('Unknown error occurred');
+        }
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchData();
   }, []);
 
@@ -41,7 +58,7 @@ const Esp32Dashboard: React.FC = () => {
     fan_status: 'Off',
   };
 
-  const convertToCSV = (jsonData: any[]) => {
+  const convertToCSV = (jsonData: Esp32Data[]) => { // Ubah tipe any[] menjadi Esp32Data[]
     const headers = ['Created at', 'DS18B20 Temp (°C)', 'DHT22 Temp (°C)', 'DHT22 Humidity (%)', 'Fan Status'];
     const csvRows = [headers.join(',')];
 

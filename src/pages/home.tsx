@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import Navbar from '../components/navbar';
 import Footer from '../components/footer';
 import Botpress from '../components/botpress';
-import logo from '../assets/standby.png';
+// import Image from 'next/image';
+// import logo from '../assets/standby.png';
 
 const HomePage: React.FC = () => {
   const [tableData, setTableData] = useState(
@@ -43,68 +44,74 @@ const HomePage: React.FC = () => {
 
   const handlePrint = () => {
     const newWin = window.open('', '_blank');
-    newWin.document.write(`
-      <html>
-        <head>
-          <title>Print</title>
-          <style>
-            body {
-              font-family: Arial, sans-serif;
-              margin: 20px;
-            }
-            table {
-              width: 100%;
-              border-collapse: collapse;
-            }
-            th, td {
-              border: 1px solid gray;
-              padding: 8px;
-              text-align: center;
-            }
-            .letterhead {
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              margin-bottom: 20px;
-            }
-            .letterhead img {
-              width: 150px;
-              margin-right: 20px; /* Adjust as necessary */
-            }
-            .title {
-              text-align: center;
-              font-size: 24px;
-              font-weight: bold;
-            }
-            @media print {
+  
+    if (newWin) {  // Pastikan newWin bukan null
+      newWin.document.write(`
+        <html>
+          <head>
+            <title>Print</title>
+            <style>
               body {
-                margin: 0;
-                padding: 0;
+                font-family: Arial, sans-serif;
+                margin: 20px;
               }
-              img {
-                max-width: 100%;
-                height: auto;
+              table {
+                width: 100%;
+                border-collapse: collapse;
               }
-            }
-          </style>
-        </head>
-        <body>
-          <div id="printableArea">
-            <div class="letterhead">
-              <img src="../assets/standby.png" alt="Logo" />
-              <div class="title">Berkas Test Report</div>
+              th, td {
+                border: 1px solid gray;
+                padding: 8px;
+                text-align: center;
+              }
+              .letterhead {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 20px;
+              }
+              .letterhead img {
+                width: 150px;
+                margin-right: 20px; /* Adjust as necessary */
+              }
+              .title {
+                text-align: center;
+                font-size: 24px;
+                font-weight: bold;
+              }
+              @media print {
+                body {
+                  margin: 0;
+                  padding: 0;
+                }
+                img {
+                  max-width: 100%;
+                  height: auto;
+                }
+              }
+            </style>
+          </head>
+          <body>
+            <div id="printableArea">
+              <div class="letterhead">
+                <img src="../assets/standby.png" alt="Logo" />
+                <div class="title">Berkas Test Report</div>
+              </div>
+              <div>
+                ${document.getElementById('printableArea')?.innerHTML} <!-- Optional chaining -->
+              </div>
             </div>
-            <div>
-              ${document.getElementById('printableArea').innerHTML}
-            </div>
-          </div>
-        </body>
-      </html>
-    `);
-    newWin.document.close();
-    newWin.print();
-    newWin.close();
+          </body>
+        </html>
+      `);
+      newWin.document.close();
+      newWin.print();
+      newWin.close();
+    } else {
+      console.error("Failed to open a new window for printing.");
+    }
   };
+  
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
@@ -123,7 +130,9 @@ const HomePage: React.FC = () => {
         <div className="mt-8 mb-10" id="printableArea"> {/* Added mb-10 for spacing */}
           {/* Letterhead Section */}
           <div className="letterhead flex items-center justify-center mb-4">
-            <img src={logo.src} alt="Logo" className="w-32 md:w-40" />
+            {/* <Image src={logo} alt="Logo" className="w-32 md:w-40" 
+            width={500} 
+            height={300}/> */}
             <div className="title text-center">
               {/* Optional: Add a title here */}
             </div>

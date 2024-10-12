@@ -2,7 +2,9 @@
 
 import supabase from '../components/SupabaseClient'; 
 import { useRouter } from 'next/navigation';
+import React from 'react';
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import logo from '../assets/standby.png';
 
 const LoginPage = () => {
@@ -44,11 +46,14 @@ const LoginPage = () => {
       <nav className="bg-white shadow-md p-4">
         <div className="container mx-auto flex justify-between items-center">
           <div className="flex items-center">
-            <img 
+          <Image 
               src={logo.src}
-              alt="Stanby Logo" 
-              className="h-8 w-8 mr-2" // Adjust size and margin as needed
-            />
+              alt="Stanby Logo"
+              width={32} 
+              height={32}
+              className="h-8 w-8 mr-2" 
+              priority  
+          />
             <h1 className="text-lg font-bold text-gray-700">StandBy</h1>
           </div>
           <button 

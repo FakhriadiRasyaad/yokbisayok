@@ -5,38 +5,57 @@ import { useRouter } from 'next/navigation';
 import supabase from '../../components/SupabaseClient';
 import Navbar from '../../components/navbar';
 import Footer from '../../components/footer';
+import Image from 'next/image';
+
+type User = {
+  id: string;
+  avatar_url: string;
+  full_name: string;
+  email: string;
+  is_admin: boolean;
+  updated_at: string;
+};
 
 const CreateUserPage = () => {
-  const [username, setUsername] = useState('');
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [username, setUsername] = useState<string>('');
+  const [fullName, setFullName] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [avatar, setAvatar] = useState<File | null>(null);
-  const [users, setUsers] = useState<any[]>([]);
-  const [error, setError] = useState('');
+  const [users, setUsers] = useState<User[]>([]); // Use User type here
+  const [error, setError] = useState<string>('');
   const router = useRouter();
 
-  // Check if the user is admin
-  useEffect(() => {
-    const checkAdmin = async () => {
-      const { data: { user }, error } = await supabase.auth.getUser();
-      if (error || !user) {
-        router.push('/login'); // Redirect to login if no user
-      } else {
-        const { data } = await supabase
-          .from('profiles')
-          .select('is_admin')
-          .eq('id', user.id)
-          .single();
-        if (!data.is_admin) {
-          router.push('/home'); // Redirect if user is not admin
-        }
-      }
-    };
+ // Check if the user is admin
+useEffect(() => {
+  const checkAdmin = async () => {
+    const { data: { user }, error } = await supabase.auth.getUser();
+    if (error || !user) {
+      router.push('/login'); // Redirect to login if no user
+      return; // Exit the function after redirection
+    }
+    
+    const { data, error: profileError } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', user.id)
+      .single();
+    
+    if (profileError) {
+      console.error('Error fetching profile:', profileError);
+      return; // Handle the error appropriately
+    }
 
-    checkAdmin();
-  }, [router]);
+    // Check if data is not null and then check is_admin
+    if (data && !data.is_admin) {
+      router.push('/home'); // Redirect if user is not admin
+    }
+  };
+
+  checkAdmin();
+}, [router]);
+
 
   // Fetch users from the database
   useEffect(() => {
@@ -79,6 +98,7 @@ const CreateUserPage = () => {
     return signedUrlData.signedUrl; // Return signed URL
   };
 
+  
   const handleCreateUser = async () => {
     try {
       // Validate avatar file
@@ -94,15 +114,15 @@ const CreateUserPage = () => {
       }
   
       // Create a new account in Supabase
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
             username,
             full_name: fullName,
-            avatar_url: avatarUrl, 
-            is_admin: isAdmin, 
+            avatar_url: avatarUrl,
+            is_admin: isAdmin,
             updated_at: new Date().toISOString(),
           },
         },
@@ -115,9 +135,17 @@ const CreateUserPage = () => {
         router.push('/user');
       }
     } catch (err) {
-      setError(err.message);
+      // Check if the error is an instance of Error
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        // Fallback error message
+        setError('An unexpected error occurred');
+      }
     }
   };
+  
+  
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -199,7 +227,7 @@ const CreateUserPage = () => {
               {users.map((user) => (
                 <tr key={user.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <img src={user.avatar_url} alt="Avatar" className="h-10 w-10 rounded-full" />
+                    <Image src={user.avatar_url} alt="Avatar" className="h-10 w-10 rounded-full" />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">{user.full_name}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{user.email}</td>
