@@ -2,73 +2,137 @@ import React, { useEffect, useState } from 'react';
 import supabase from '../components/SupabaseClient';
 import Navbar from '../components/navbar';
 import Footer from '../components/footer';
-import Botpress from '../components/botpress';
+// import { Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 
-// Definisikan tipe untuk data ESP32
-interface Esp32Data {
-  id: number;
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+
+interface SensorData {
   created_at: string;
-  ds18b20_temp: number;
+  ds18b20_temp1: number;
+  ds18b20_temp2: number;
+  ds18b20_temp3: number;
+  ds18b20_temp4: number;
   dht22_temp: number;
   dht22_humi: number;
   fan_status: string;
+  flow_rate: number;
+  sound_detected: string;
 }
 
 const Esp32Dashboard: React.FC = () => {
-  const [data, setData] = useState<Esp32Data[]>([]); // Ubah dari any[] ke Esp32Data[]
+  const [data, setData] = useState<SensorData[]>([]);
+  const [activeSource, setActiveSource] = useState<'esp32' | 'esp32_duplicate'>('esp32');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
-        const { data: esp32Data, error } = await supabase
+        const { data: esp32Data, error: esp32Error } = await supabase
           .from('esp32')
           .select('*')
           .order('created_at', { ascending: true });
 
-        if (error) throw error;
+        if (esp32Error) throw esp32Error;
 
-        setData(esp32Data as Esp32Data[]);
-      } catch (error: unknown) {
-        // Periksa apakah error adalah objek dan memiliki properti 'message'
+        const { data: esp32DuplicateData, error: esp32DuplicateError } = await supabase
+          .from('esp32_duplicate')
+          .select('*')
+          .order('created_at', { ascending: true });
+
+        if (esp32DuplicateError) throw esp32DuplicateError;
+
+        setData(activeSource === 'esp32' ? esp32Data as SensorData[] : esp32DuplicateData as SensorData[]);
+      } catch (error) {
         if (error instanceof Error) {
           console.error('Error fetching data:', error.message);
           setError('Failed to fetch data: ' + error.message);
         } else {
-          // Jika error bukan instance dari Error, gunakan pesan default
-          console.error('Unknown error fetching data');
-          setError('Unknown error occurred');
+          console.error('Unexpected error:', error);
+          setError('An unexpected error occurred');
         }
       } finally {
         setLoading(false);
       }
     };
-  
+
     fetchData();
-  }, []);
+  }, [activeSource]);
 
   if (loading) return <div className="text-center py-10">Loading...</div>;
   if (error) return <div className="text-center text-red-500 py-10">{error}</div>;
 
   const latestData = data.length > 0 ? data[data.length - 1] : {
-    ds18b20_temp: 0,
+    ds18b20_temp1: 0,
+    ds18b20_temp2: 0,
+    ds18b20_temp3: 0,
+    ds18b20_temp4: 0,
     dht22_temp: 0,
     dht22_humi: 0,
     fan_status: 'Off',
+    flow_rate: 0,
+    sound_detected: 'Sunyi',
   };
 
-  const convertToCSV = (jsonData: Esp32Data[]) => { // Ubah tipe any[] menjadi Esp32Data[]
-    const headers = ['Created at', 'DS18B20 Temp (°C)', 'DHT22 Temp (°C)', 'DHT22 Humidity (%)', 'Fan Status'];
+  // const chartData = {
+  //   labels: data.map(item => item.created_at),
+  //   datasets: [
+  //     {
+  //       label: 'DS18B20 Temperature1 (°C)',
+  //       data: data.map(item => item.ds18b20_temp1),
+  //       backgroundColor: 'rgba(255, 99, 132, 0.6)',
+  //     },
+  //     {
+  //       label: 'DS18B20 Temperature2 (°C)',
+  //       data: data.map(item => item.ds18b20_temp2),
+  //       backgroundColor: 'rgba(255, 206, 86, 0.6)',
+  //     },
+  //     {
+  //       label: 'DS18B20 Temperature3 (°C)',
+  //       data: data.map(item => item.ds18b20_temp3),
+  //       backgroundColor: 'rgba(54, 162, 235, 0.6)',
+  //     },
+  //     {
+  //       label: 'DS18B20 Temperature4 (°C)',
+  //       data: data.map(item => item.ds18b20_temp4),
+  //       backgroundColor: 'rgba(153, 102, 255, 0.6)',
+  //     },
+  //     {
+  //       label: 'DHT22 Temperature (°C)',
+  //       data: data.map(item => item.dht22_temp),
+  //       backgroundColor: 'rgba(255, 99, 132, 0.6)',
+  //     },
+  //     {
+  //       label: 'DHT22 Humidity (%)',
+  //       data: data.map(item => item.dht22_humi),
+  //       backgroundColor: 'rgba(255, 206, 86, 0.6)',
+  //     },
+  //     {
+  //       label: 'Flow Rate',
+  //       data: data.map(item => item.flow_rate),
+  //       backgroundColor: 'rgba(54, 162, 235, 0.6)',
+  //     },
+  //   ],
+  // };
+
+  const convertToCSV = (jsonData: SensorData[]) => {
+    const headers = ['Created at', 'DS18B20 Temp1 (°C)', 'DS18B20 Temp2 (°C)', 'DS18B20 Temp3 (°C)', 'DS18B20 Temp4 (°C)', 'DHT22 Temp (°C)', 'DHT22 Humidity (%)', 'Fan Status', 'Sound Detected', 'Flow Rate'];
     const csvRows = [headers.join(',')];
 
     jsonData.forEach((item) => {
       const row = [
-        new Date(item.created_at).toLocaleString(),
-        item.ds18b20_temp,
+        item.created_at,
+        item.ds18b20_temp1,
+        item.ds18b20_temp2,
+        item.ds18b20_temp3,
+        item.ds18b20_temp4,
         item.dht22_temp,
         item.dht22_humi,
         item.fan_status,
+        item.sound_detected,
+        item.flow_rate,
       ];
       csvRows.push(row.join(','));
     });
@@ -89,70 +153,76 @@ const Esp32Dashboard: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
-      <Botpress />
       <div className="flex-grow container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 gap-4 mb-8">
           <div className="bg-white shadow-lg rounded-lg p-6">
             <h3 className="text-xl font-semibold mb-4">Sensor Data</h3>
+            <div className="flex space-x-4 mb-4">
+              <button
+                className={`bg-blue-500 text-white px-4 py-2 rounded ${activeSource === 'esp32' ? 'font-bold' : ''}`}
+                onClick={() => setActiveSource('esp32')}
+              >
+                Source A (ESP32)
+              </button>
+              <button
+                className={`bg-blue-500 text-white px-4 py-2 rounded ${activeSource === 'esp32_duplicate' ? 'font-bold' : ''}`}
+                onClick={() => setActiveSource('esp32_duplicate')}
+              >
+                Source B (ESP32 Duplicate)
+              </button>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="bg-gray-100 border border-gray-300 p-4 text-center rounded-lg">
-                <h4 className="font-medium">DS18B20 Temperature</h4>
-                <p className="text-3xl font-bold text-teal-600">{latestData.ds18b20_temp}°C</p>
+                <h4 className="font-medium">DS18B20 Temperature1</h4>
+                <p className="text-3xl font-bold text-teal-600">{latestData.ds18b20_temp1}°C</p>
+              </div>
+              <div className="bg-gray-100 border border-gray-300 p-4 text-center rounded-lg">
+                <h4 className="font-medium">DS18B20 Temperature2</h4>
+                <p className="text-3xl font-bold text-teal-600">{latestData.ds18b20_temp2}°C</p>
+              </div>
+              <div className="bg-gray-100 border border-gray-300 p-4 text-center rounded-lg">
+                <h4 className="font-medium">DS18B20 Temperature3</h4>
+                <p className="text-3xl font-bold text-teal-600">{latestData.ds18b20_temp3}°C</p>
+              </div>
+              <div className="bg-gray-100 border border-gray-300 p-4 text-center rounded-lg">
+                <h4 className="font-medium">DS18B20 Temperature4</h4>
+                <p className="text-3xl font-bold text-teal-600">{latestData.ds18b20_temp4}°C</p>
               </div>
               <div className="bg-gray-100 border border-gray-300 p-4 text-center rounded-lg">
                 <h4 className="font-medium">DHT22 Temperature</h4>
-                <p className="text-3xl font-bold text-pink-600">{latestData.dht22_temp}°C</p>
+                <p className="text-3xl font-bold text-teal-600">{latestData.dht22_temp}°C</p>
               </div>
               <div className="bg-gray-100 border border-gray-300 p-4 text-center rounded-lg">
                 <h4 className="font-medium">DHT22 Humidity</h4>
-                <p className="text-3xl font-bold text-blue-600">{latestData.dht22_humi}%</p>
+                <p className="text-3xl font-bold text-teal-600">{latestData.dht22_humi}%</p>
               </div>
               <div className="bg-gray-100 border border-gray-300 p-4 text-center rounded-lg">
                 <h4 className="font-medium">Fan Status</h4>
-                <div className={`p-2 rounded-lg text-white text-xl font-bold ${latestData.fan_status === 'On' ? 'bg-green-500' : 'bg-red-500'}`}>
-                  {latestData.fan_status}
-                </div>
+                <p className="text-3xl font-bold text-teal-600">{latestData.fan_status}</p>
+              </div>
+              <div className="bg-gray-100 border border-gray-300 p-4 text-center rounded-lg">
+                <h4 className="font-medium">Flow Rate</h4>
+                <p className="text-3xl font-bold text-teal-600">{latestData.flow_rate} L/min</p>
+              </div>
+              <div className="bg-gray-100 border border-gray-300 p-4 text-center rounded-lg">
+                <h4 className="font-medium">Sound Detected</h4>
+                <p className="text-3xl font-bold text-teal-600">{latestData.sound_detected}</p>
               </div>
             </div>
+            <button
+              className="mt-4 bg-green-500 text-white px-4 py-2 rounded"
+              onClick={downloadCSV}
+            >
+              Download CSV
+            </button>
           </div>
-        </div>
-
-        {/* Data Table Section */}
-        <div>
-          <h2 className="text-xl font-bold mb-4">ESP32 Data Table</h2>
-          <table className="table-auto border-collapse border border-gray-400 w-full mb-4">
-            <thead>
-              <tr>
-                <th className="border border-gray-400 p-2">Created at</th>
-                <th className="border border-gray-400 p-2">DS18B20 Temp (°C)</th>
-                <th className="border border-gray-400 p-2">DHT22 Temp (°C)</th>
-                <th className="border border-gray-400 p-2">DHT22 Humidity (%)</th>
-                <th className="border border-gray-400 p-2">Fan Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((item) => (
-                <tr key={item.id} className="hover:bg-gray-100 transition duration-200">
-                  <td className="border border-gray-400 p-2">{new Date(item.created_at).toLocaleString()}</td>
-                  <td className="border border-gray-400 p-2">{item.ds18b20_temp}</td>
-                  <td className="border border-gray-400 p-2">{item.dht22_temp}</td>
-                  <td className="border border-gray-400 p-2">{item.dht22_humi}</td>
-                  <td className="border border-gray-400 p-2">{item.fan_status}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <button
-            className="bg-blue-600 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded transition duration-300"
-            onClick={downloadCSV}
-          >
-            Download CSV
-          </button>
-          <div className="mt-20"> {/* Margin above the footer */}
-            <Footer />
-          </div>
+          {/* <div className="bg-white shadow-lg rounded-lg p-6">
+            <h3 className="text-xl font-semibold mb-4">Temperature and Humidity Chart</h3>
+            <Bar data={chartData} options={{ responsive: true, maintainAspectRatio: false }} />
+          </div> */}
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

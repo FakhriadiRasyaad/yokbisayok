@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import Navbar from '../components/navbar';
 import Footer from '../components/footer';
 import Botpress from '../components/botpress';
-// import Image from 'next/image';
-// import logo from '../assets/standby.png';
+import logo from '../assets/standby.png';
+import DisplayPDFs from '../components/displaypdf';
+import Image from 'next/image';
+
 
 const HomePage: React.FC = () => {
   const [tableData, setTableData] = useState(
@@ -22,119 +24,88 @@ const HomePage: React.FC = () => {
     "Data Dalam Proses Verifikasi",
     "Data Selesai"
   ];
-
-  const placeholders = [
-    "Masukin data A",
-    "Masukin data kemarin",
-    "Masukin data pengujian",
-    "Masukin data akhir",
-    "Masukin data tambahan",
-    "Masukin data validasi",
-    "Masukin data catatan",
-    "Masukin data review",
-    "Masukin data perbaikan",
-    "Masukin data final"
-  ];
-
   const handleInputChange = (rowIndex: number, colIndex: number, value: string) => {
     const newData = [...tableData];
     newData[rowIndex][colIndex] = value;
     setTableData(newData);
   };
-
-  const handlePrint = () => {
-    const newWin = window.open('', '_blank');
-  
-    if (newWin) {  // Pastikan newWin bukan null
-      newWin.document.write(`
-        <html>
-          <head>
-            <title>Print</title>
-            <style>
-              body {
-                font-family: Arial, sans-serif;
-                margin: 20px;
-              }
-              table {
-                width: 100%;
-                border-collapse: collapse;
-              }
-              th, td {
-                border: 1px solid gray;
-                padding: 8px;
-                text-align: center;
-              }
-              .letterhead {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin-bottom: 20px;
-              }
-              .letterhead img {
-                width: 150px;
-                margin-right: 20px; /* Adjust as necessary */
-              }
-              .title {
-                text-align: center;
-                font-size: 24px;
-                font-weight: bold;
-              }
-              @media print {
-                body {
-                  margin: 0;
-                  padding: 0;
-                }
-                img {
-                  max-width: 100%;
-                  height: auto;
-                }
-              }
-            </style>
-          </head>
-          <body>
-            <div id="printableArea">
-              <div class="letterhead">
-                <img src="../assets/standby.png" alt="Logo" />
-                <div class="title">Berkas Test Report</div>
-              </div>
-              <div>
-                ${document.getElementById('printableArea')?.innerHTML} <!-- Optional chaining -->
-              </div>
-            </div>
-          </body>
-        </html>
-      `);
-      newWin.document.close();
-      newWin.print();
-      newWin.close();
-    } else {
-      console.error("Failed to open a new window for printing.");
-    }
-  };
-  
-
-  return (
+return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <Navbar />
       <Botpress />
+      <DisplayPDFs />
       <main className="flex-1 p-4 md:p-8">
-        <div className="flex justify-end mb-4">
-          <button 
-            onClick={handlePrint} 
-            className="px-4 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700 transition duration-300"
-          >
-            Print
-          </button>
-        </div>
-
-        <div className="mt-8 mb-10" id="printableArea"> {/* Added mb-10 for spacing */}
-          {/* Letterhead Section */}
-          <div className="letterhead flex items-center justify-center mb-4">
-            {/* <Image src={logo} alt="Logo" className="w-32 md:w-40" 
-            width={500} 
-            height={300}/> */}
-            <div className="title text-center">
-              {/* Optional: Add a title here */}
+        <div className="mt-8 mb-10 relative" id="printableArea">
+          <div className="letterhead flex items-center justify-between mb-0.5">
+            <Image src={logo.src} alt="Logo" className="w-32 md:w-40 mr-4" />
+            <div className="flex-grow text-center">
+              <h1 className="text-xl font-bold">TEST REPORT</h1>
+            </div>
+          </div>
+          <hr className="mt-0 mb-2 w-full border-t-2 border-gray-300" />
+          <div className="mb-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="col-span-1">
+                <div className="flex items-center mb-2">
+                  <label className="block text-sm font-bold text-gray-700 w-1/3">No. Lab :</label>
+                  <input
+                    type="text"
+                    className="p-1 rounded w-2/3 bg-transparent placeholder-gray-400 focus:outline-none focus:ring focus:ring-blue-300"
+                    placeholder="Masukkan No. Lab"
+                  />
+                </div>
+                <div className="flex items-center mb-2">
+                  <label className="block text-sm font-bold text-gray-700 w-1/3">Nama Produk :</label>
+                  <input
+                    type="text"
+                    className="p-1 rounded w-2/3 bg-transparent placeholder-gray-400 focus:outline-none focus:ring focus:ring-blue-300"
+                    placeholder="Masukkan Nama Produk"
+                  />
+                </div>
+                <div className="flex items-center mb-2">
+                  <label className="block text-sm font-bold text-gray-700 w-1/3">Model :</label>
+                  <input
+                    type="text"
+                    className="p-1 rounded w-2/3 bg-transparent placeholder-gray-400 focus:outline-none focus:ring focus:ring-blue-300"
+                    placeholder="Masukkan Model"
+                  />
+                </div>
+                <div className="flex items-center mb-2">
+                  <p className="text-sm font-bold text-gray-700">Referensi : SNI IEC 60601-1:2024</p>
+                </div>
+              </div>
+              <div className="col-span-1">
+                <div className="flex items-center mb-2">
+                  <label className="block text-sm font-bold text-gray-700 w-1/3">Author :</label>
+                  <input
+                    type="text"
+                    className="p-1 rounded w-2/3 bg-transparent placeholder-gray-400 focus:outline-none focus:ring focus:ring-blue-300"
+                    placeholder="Masukkan Author"
+                  />
+                </div>
+                <div className="flex items-center mb-2">
+                  <label className="block text-sm font-bold text-gray-700 w-1/3">No. Serial :</label>
+                  <input
+                    type="text"
+                    className="p-1 rounded w-2/3 bg-transparent placeholder-gray-400 focus:outline-none focus:ring focus:ring-blue-300"
+                    placeholder="Masukkan No. Serial"
+                  />
+                </div>
+                <div className="flex items-center mb-2">
+                  <p className="text-sm font-bold text-gray-700">
+                    Tanggal Uji: {new Date().toLocaleString('id-ID', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit',
+                      hour12: false
+                    })}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -154,17 +125,17 @@ const HomePage: React.FC = () => {
                   <td className="px-4 py-2 border border-gray-300">{keteranganData[rowIndex]}</td>
                   <td className="px-4 py-2 border border-gray-300">
                     <textarea
-                      className="w-full p-2 border border-gray-300 resize-y placeholder-gray-400 rounded focus:outline-none focus:ring focus:ring-blue-300"
+                      className="w-full p-2 bg-transparent border-none resize-y placeholder-gray-400 focus:outline-none focus:ring-0"
                       value={rowData[0]}
                       onChange={(e) => handleInputChange(rowIndex, 0, e.target.value)}
-                      placeholder={placeholders[rowIndex]}
+                      placeholder="Masukan Data"
                       rows={2}
                       style={{ minHeight: '50px' }}
                     />
                   </td>
                   <td className="px-4 py-2 border border-gray-300">
                     <select
-                      className="w-full p-2 border border-gray-300 appearance-none bg-white rounded focus:outline-none focus:ring focus:ring-blue-300"
+                      className="w-full p-2 bg-transparent border-none appearance-none rounded focus:outline-none focus:ring-0"
                       value={rowData[1]}
                       onChange={(e) => handleInputChange(rowIndex, 1, e.target.value)}
                     >
