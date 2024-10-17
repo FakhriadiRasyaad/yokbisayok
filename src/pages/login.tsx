@@ -100,12 +100,7 @@ const LoginPage = () => {
       )}
 
      
-      <div className="relative z-10 p-8">
-        <h2>standbyincubator@gmail.com</h2>
-        <h2>standby123</h2>
-        <h2>fakhriadi06ras@gmail.com</h2>
-        <h2>qwerty12345</h2>
-      </div>
+    
     </div>
   );
 };
