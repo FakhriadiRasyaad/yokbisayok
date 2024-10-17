@@ -163,7 +163,7 @@ const SettingsPage = () => {
             />
             <button
               onClick={handleUpdateAvatar}
-              className="bg-blue-500 text-white rounded-lg p-2 w-full hover:bg-blue-600 mt-4 transition duration-200"
+              className="bg-red-500 text-white rounded-lg p-2 w-full hover:bg-red-800 mt-4 transition duration-200"
             >
               Update Avatar
             </button>

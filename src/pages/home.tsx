@@ -6,7 +6,6 @@ import logo from '../assets/standby.png';
 import DisplayPDFs from '../components/displaypdf';
 import Image from 'next/image';
 
-
 const HomePage: React.FC = () => {
   const [tableData, setTableData] = useState(
     Array.from({ length: 10 }, () => Array(2).fill(''))
@@ -24,12 +23,14 @@ const HomePage: React.FC = () => {
     "Data Dalam Proses Verifikasi",
     "Data Selesai"
   ];
+
   const handleInputChange = (rowIndex: number, colIndex: number, value: string) => {
     const newData = [...tableData];
     newData[rowIndex][colIndex] = value;
     setTableData(newData);
   };
-return (
+
+  return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <Navbar />
       <Botpress />
@@ -109,50 +110,51 @@ return (
             </div>
           </div>
 
-          <table className="min-w-full table-auto border-collapse border border-gray-300 bg-white shadow-lg rounded">
-            <thead className="bg-gray-200">
-              <tr>
-                <th className="px-4 py-2 border border-gray-300">NO</th>
-                <th className="px-4 py-2 border border-gray-300">KETERANGAN</th>
-                <th className="px-4 py-2 border border-gray-300">PENJELASAN</th>
-                <th className="px-4 py-2 border border-gray-300">HASIL</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tableData.map((rowData, rowIndex) => (
-                <tr key={rowIndex} className="text-center hover:bg-gray-100 transition duration-150">
-                  <td className="px-4 py-2 border border-gray-300">{rowIndex + 1}</td>
-                  <td className="px-4 py-2 border border-gray-300">{keteranganData[rowIndex]}</td>
-                  <td className="px-4 py-2 border border-gray-300">
-                    <textarea
-                      className="w-full p-2 bg-transparent border-none resize-y placeholder-gray-400 focus:outline-none focus:ring-0"
-                      value={rowData[0]}
-                      onChange={(e) => handleInputChange(rowIndex, 0, e.target.value)}
-                      placeholder="Masukan Data"
-                      rows={2}
-                      style={{ minHeight: '50px' }}
-                    />
-                  </td>
-                  <td className="px-4 py-2 border border-gray-300">
-                    <select
-                      className="w-full p-2 bg-transparent border-none appearance-none rounded focus:outline-none focus:ring-0"
-                      value={rowData[1]}
-                      onChange={(e) => handleInputChange(rowIndex, 1, e.target.value)}
-                    >
-                      <option value="">Pilih...</option>
-                      <option value="P">P</option>
-                      <option value="L">L</option>
-                      <option value="NC">NC</option>
-                      <option value="NA">NA</option>
-                    </select>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="min-w-full table-auto border-collapse border border-gray-300 bg-white shadow-lg rounded">
+              <thead className="bg-gray-200">
+                <tr>
+                  <th className="px-2 md:px-4 py-2 border border-gray-300">NO</th>
+                  <th className="px-2 md:px-4 py-2 border border-gray-300">KETERANGAN</th>
+                  <th className="px-2 md:px-4 py-2 border border-gray-300">PENJELASAN</th>
+                  <th className="px-2 md:px-4 py-2 border border-gray-300">HASIL</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {tableData.map((rowData, rowIndex) => (
+                  <tr key={rowIndex} className="text-center hover:bg-gray-100 transition duration-150">
+                    <td className="px-2 md:px-4 py-2 border border-gray-300">{rowIndex + 1}</td>
+                    <td className="px-2 md:px-4 py-2 border border-gray-300">{keteranganData[rowIndex]}</td>
+                    <td className="px-2 md:px-4 py-2 border border-gray-300">
+                      <textarea
+                        className="w-full p-2 bg-transparent border-none resize-y placeholder-gray-400 focus:outline-none focus:ring-0"
+                        value={rowData[0]}
+                        onChange={(e) => handleInputChange(rowIndex, 0, e.target.value)}
+                        placeholder="Masukan Data"
+                        rows={2}
+                        style={{ minHeight: '50px' }}
+                      />
+                    </td>
+                    <td className="px-2 md:px-4 py-2 border border-gray-300">
+                      <select
+                        className="w-full p-2 bg-transparent border-none appearance-none rounded focus:outline-none focus:ring-0"
+                        value={rowData[1]}
+                        onChange={(e) => handleInputChange(rowIndex, 1, e.target.value)}
+                      >
+                        <option value="">Pilih...</option>
+                        <option value="P">P</option>
+                        <option value="L">L</option>
+                        <option value="NC">NC</option>
+                        <option value="NA">NA</option>
+                      </select>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </main>
-
       <Footer />
     </div>
   );

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import supabase from '../components/SupabaseClient';
 import Navbar from '../components/navbar';
 import Footer from '../components/footer';
-// import { Bar } from 'react-chartjs-2';
+import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -22,7 +22,7 @@ interface SensorData {
 
 const Esp32Dashboard: React.FC = () => {
   const [data, setData] = useState<SensorData[]>([]);
-  const [activeSource, setActiveSource] = useState<'esp32' | 'esp32_duplicate'>('esp32');
+  const [activeSource, setActiveSource] = useState<'esp32_1' | 'esp32_duplicate'>('esp32_1');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,7 +31,7 @@ const Esp32Dashboard: React.FC = () => {
       setLoading(true);
       try {
         const { data: esp32Data, error: esp32Error } = await supabase
-          .from('esp32')
+          .from('esp32_1')
           .select('*')
           .order('created_at', { ascending: true });
 
@@ -44,7 +44,7 @@ const Esp32Dashboard: React.FC = () => {
 
         if (esp32DuplicateError) throw esp32DuplicateError;
 
-        setData(activeSource === 'esp32' ? esp32Data as SensorData[] : esp32DuplicateData as SensorData[]);
+        setData(activeSource === 'esp32_1' ? esp32Data as SensorData[] : esp32DuplicateData as SensorData[]);
       } catch (error) {
         if (error instanceof Error) {
           console.error('Error fetching data:', error.message);
@@ -76,46 +76,67 @@ const Esp32Dashboard: React.FC = () => {
     sound_detected: 'Sunyi',
   };
 
-  // const chartData = {
-  //   labels: data.map(item => item.created_at),
-  //   datasets: [
-  //     {
-  //       label: 'DS18B20 Temperature1 (°C)',
-  //       data: data.map(item => item.ds18b20_temp1),
-  //       backgroundColor: 'rgba(255, 99, 132, 0.6)',
-  //     },
-  //     {
-  //       label: 'DS18B20 Temperature2 (°C)',
-  //       data: data.map(item => item.ds18b20_temp2),
-  //       backgroundColor: 'rgba(255, 206, 86, 0.6)',
-  //     },
-  //     {
-  //       label: 'DS18B20 Temperature3 (°C)',
-  //       data: data.map(item => item.ds18b20_temp3),
-  //       backgroundColor: 'rgba(54, 162, 235, 0.6)',
-  //     },
-  //     {
-  //       label: 'DS18B20 Temperature4 (°C)',
-  //       data: data.map(item => item.ds18b20_temp4),
-  //       backgroundColor: 'rgba(153, 102, 255, 0.6)',
-  //     },
-  //     {
-  //       label: 'DHT22 Temperature (°C)',
-  //       data: data.map(item => item.dht22_temp),
-  //       backgroundColor: 'rgba(255, 99, 132, 0.6)',
-  //     },
-  //     {
-  //       label: 'DHT22 Humidity (%)',
-  //       data: data.map(item => item.dht22_humi),
-  //       backgroundColor: 'rgba(255, 206, 86, 0.6)',
-  //     },
-  //     {
-  //       label: 'Flow Rate',
-  //       data: data.map(item => item.flow_rate),
-  //       backgroundColor: 'rgba(54, 162, 235, 0.6)',
-  //     },
-  //   ],
-  // };
+  const chartData = {
+    labels: data.map(item => item.created_at),
+    datasets: [
+      {
+        label: 'DS18B20 Temperature1 (°C)',
+        data: data.map(item => item.ds18b20_temp1),
+        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+      },
+      {
+        label: 'DS18B20 Temperature2 (°C)',
+        data: data.map(item => item.ds18b20_temp2),
+        backgroundColor: 'rgba(255, 206, 86, 0.6)',
+      },
+      {
+        label: 'DS18B20 Temperature3 (°C)',
+        data: data.map(item => item.ds18b20_temp3),
+        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+      },
+      {
+        label: 'DS18B20 Temperature4 (°C)',
+        data: data.map(item => item.ds18b20_temp4),
+        backgroundColor: 'rgba(153, 102, 255, 0.6)',
+      },
+      {
+        label: 'DHT22 Temperature (°C)',
+        data: data.map(item => item.dht22_temp),
+        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+      },
+      {
+        label: 'DHT22 Humidity (%)',
+        data: data.map(item => item.dht22_humi),
+        backgroundColor: 'rgba(255, 206, 86, 0.6)',
+      },
+      {
+        label: 'Flow Rate',
+        data: data.map(item => item.flow_rate),
+        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+      },
+    ],
+  };
+  const chartDatas = {
+    labels: data.map(item => item.created_at),
+    datasets: [
+      {
+        label: 'DHT22 Humidity (°C)',
+        data: data.map(item => item.dht22_temp),
+        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+      },
+      {
+        label: 'DHT22 Temperature (°C)',
+        data: data.map(item => item.dht22_humi),
+        backgroundColor: 'rgba(255, 206, 86, 0.6)',
+      },
+      {
+        label: 'Flow (%)',
+        data: data.map(item => item.flow_rate),
+        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+      },
+    ],
+  };
+
 
   const convertToCSV = (jsonData: SensorData[]) => {
     const headers = ['Created at', 'DS18B20 Temp1 (°C)', 'DS18B20 Temp2 (°C)', 'DS18B20 Temp3 (°C)', 'DS18B20 Temp4 (°C)', 'DHT22 Temp (°C)', 'DHT22 Humidity (%)', 'Fan Status', 'Sound Detected', 'Flow Rate'];
@@ -159,8 +180,8 @@ const Esp32Dashboard: React.FC = () => {
             <h3 className="text-xl font-semibold mb-4">Sensor Data</h3>
             <div className="flex space-x-4 mb-4">
               <button
-                className={`bg-blue-500 text-white px-4 py-2 rounded ${activeSource === 'esp32' ? 'font-bold' : ''}`}
-                onClick={() => setActiveSource('esp32')}
+                className={`bg-blue-500 text-white px-4 py-2 rounded ${activeSource === 'esp32_1' ? 'font-bold' : ''}`}
+                onClick={() => setActiveSource('esp32_1')}
               >
                 Source A (ESP32)
               </button>
@@ -190,40 +211,89 @@ const Esp32Dashboard: React.FC = () => {
               </div>
               <div className="bg-gray-100 border border-gray-300 p-4 text-center rounded-lg">
                 <h4 className="font-medium">DHT22 Temperature</h4>
-                <p className="text-3xl font-bold text-teal-600">{latestData.dht22_temp}°C</p>
+                <p className="text-3xl font-bold text-pink-600">{latestData.dht22_temp}°C</p>
               </div>
               <div className="bg-gray-100 border border-gray-300 p-4 text-center rounded-lg">
                 <h4 className="font-medium">DHT22 Humidity</h4>
-                <p className="text-3xl font-bold text-teal-600">{latestData.dht22_humi}%</p>
+                <p className="text-3xl font-bold text-blue-600">{latestData.dht22_humi}%</p>
               </div>
               <div className="bg-gray-100 border border-gray-300 p-4 text-center rounded-lg">
                 <h4 className="font-medium">Fan Status</h4>
-                <p className="text-3xl font-bold text-teal-600">{latestData.fan_status}</p>
+                <p className="text-3xl font-bold text-green-600">{latestData.fan_status}</p>
               </div>
               <div className="bg-gray-100 border border-gray-300 p-4 text-center rounded-lg">
                 <h4 className="font-medium">Flow Rate</h4>
-                <p className="text-3xl font-bold text-teal-600">{latestData.flow_rate} L/min</p>
+                <p className="text-3xl font-bold text-orange-600">{latestData.flow_rate}</p>
               </div>
               <div className="bg-gray-100 border border-gray-300 p-4 text-center rounded-lg">
                 <h4 className="font-medium">Sound Detected</h4>
-                <p className="text-3xl font-bold text-teal-600">{latestData.sound_detected}</p>
+                <p className="text-3xl font-bold text-red-600">{latestData.sound_detected}</p>
               </div>
             </div>
+
+            <div className="bg-white shadow-lg rounded-lg p-6 w-full h-96">
+            <h3 className="text-xl font-semibold mb-4">Temperature Chart</h3>
+            <div className="overflow-x-auto">
+              <Bar data={chartData} options={{ responsive: true, maintainAspectRatio: false }} />
+            </div>
+          </div>
+
+          <div className="bg-white shadow-lg rounded-lg p-6 w-full h-96">
+            <h3 className="text-xl font-semibold mb-4">DHT22 Chart</h3>
+            <div className="overflow-x-auto">
+              <Bar data={chartDatas} options={{ responsive: true, maintainAspectRatio: false }} />
+            </div>
+          </div>
+
+
+
+          <div className="bg-white shadow-lg rounded-lg p-6">
+            <h3 className="text-xl font-semibold mb-4">Data Table</h3>
+            <div className="overflow-x-auto">
             <button
               className="mt-4 bg-green-500 text-white px-4 py-2 rounded"
-              onClick={downloadCSV}
-            >
+              onClick={downloadCSV}>
               Download CSV
             </button>
+            <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created at</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DS18B20 Temp1</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DS18B20 Temp2</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DS18B20 Temp3</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DS18B20 Temp4</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DHT22 Temp</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DHT22 Humidity</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fan Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sound Detected</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Flow Rate</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {data.map((item) => (
+                    <tr key={item.created_at}>
+                      <td className="px-6 py-4 whitespace-nowrap">{item.created_at}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{item.ds18b20_temp1}°C</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{item.ds18b20_temp2}°C</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{item.ds18b20_temp3}°C</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{item.ds18b20_temp4}°C</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{item.dht22_temp}°C</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{item.dht22_humi}%</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{item.fan_status}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{item.sound_detected}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{item.flow_rate}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-          {/* <div className="bg-white shadow-lg rounded-lg p-6">
-            <h3 className="text-xl font-semibold mb-4">Temperature and Humidity Chart</h3>
-            <Bar data={chartData} options={{ responsive: true, maintainAspectRatio: false }} />
-          </div> */}
         </div>
-      </div>
-      <Footer />
+       </div>
     </div>
+  <Footer />
+</div>
   );
 };
 

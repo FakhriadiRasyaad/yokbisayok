@@ -54,7 +54,7 @@ const DisplayPDFs = () => {
             />
             <button
             onClick={() => window.open(pdfUrl, '_blank')}
-            className="text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2"
+            className="text-white bg-red-500 hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2"
             >
             Download PDF
             </button>

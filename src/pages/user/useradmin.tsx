@@ -153,7 +153,6 @@ useEffect(() => {
       <div className="flex flex-col items-center justify-center flex-1 p-8">
         <h1 className="text-3xl font-bold mb-6">Buat Akun Baru</h1>
         {error && <p className="text-red-500 mb-4">{error}</p>}
-
         <div className="w-full max-w-md space-y-4">
           <input
             type="text"
@@ -205,7 +204,7 @@ useEffect(() => {
 
           <button
             onClick={handleCreateUser}
-            className="flex items-center justify-center bg-blue-600 text-white rounded-lg p-3 w-full hover:bg-blue-700 transition"
+            className="flex items-center justify-center bg-red-500 text-white rounded-lg p-3 w-full hover:bg-red-800 transition"
           >
             Buat Akun
           </button>
