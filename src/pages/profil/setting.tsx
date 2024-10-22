@@ -61,7 +61,7 @@ const SettingsPage = () => {
 
     const { data: signedUrlData, error: signedUrlError } = await supabase.storage
       .from('avatars')
-      .createSignedUrl(uploadData.path, 60 * 60);
+      .createSignedUrl(uploadData.path, 60 * 60 * 24 * 365 * 10);
 
     if (signedUrlError) {
       console.error('Error creating signed URL:', signedUrlError);
