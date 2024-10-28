@@ -5,66 +5,57 @@ import { useRouter } from 'next/navigation';
 import supabase from '../../components/SupabaseClient';
 import Navbar from '../../components/navbar';
 import Footer from '../../components/footer';
-import Image from 'next/image';
+// import Image from 'next/image';
 
 type User = {
   id: string;
-  avatar_url: string;
   full_name: string;
   email: string;
+  avatar_url: string;
   is_admin: boolean;
   updated_at: string;
 };
 
 const CreateUserPage = () => {
-  const [username, setUsername] = useState<string>('');
-  const [fullName, setFullName] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [username, setUsername] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
   const [avatar, setAvatar] = useState<File | null>(null);
-  const [users, setUsers] = useState<User[]>([]); // Use User type here
-  const [error, setError] = useState<string>('');
+  const [users, setUsers] = useState<User[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
- // Check if the user is admin
-useEffect(() => {
-  const checkAdmin = async () => {
-    const { data: { user }, error } = await supabase.auth.getUser();
-    if (error || !user) {
-      router.push('/login'); // Redirect to login if no user
-      return; // Exit the function after redirection
-    }
-    
-    const { data, error: profileError } = await supabase
-      .from('profiles')
-      .select('is_admin')
-      .eq('id', user.id)
-      .single();
-    
-    if (profileError) {
-      console.error('Error fetching profile:', profileError);
-      return; // Handle the error appropriately
-    }
+  // Fungsi untuk memeriksa apakah user adalah admin
+  useEffect(() => {
+    const checkAdmin = async () => {
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (error || !user) {
+        router.push('/login'); // Redirect ke login jika tidak ada user
+      } else {
+        const { data } = await supabase
+          .from('profiles')
+          .select('is_admin')
+          .eq('id', user.id)
+          .single();
+        if (!data?.is_admin) {
+          router.push('/home'); // Redirect jika user bukan admin
+        }
+      }
+    };
 
-    // Check if data is not null and then check is_admin
-    if (data && !data.is_admin) {
-      router.push('/home'); // Redirect if user is not admin
-    }
-  };
+    checkAdmin();
+  }, [router]);
 
-  checkAdmin();
-}, [router]);
-
-
-  // Fetch users from the database
+  // Mengambil daftar user dari database
   useEffect(() => {
     const fetchUsers = async () => {
       const { data, error } = await supabase.from('profiles').select('*');
       if (error) {
         console.error('Error fetching users:', error);
-      } else {
-        setUsers(data);
+      } else if (data) {
+        setUsers(data as User[]);
       }
     };
 
@@ -72,48 +63,47 @@ useEffect(() => {
   }, []);
 
   const uploadAvatar = async (file: File) => {
-    const timestamp = new Date().toISOString().replace(/[-:.]/g, ''); // Format date as YYYYMMDDTHHMMSS
-    const fileName = `${timestamp}-${file.name}`; // Create a new file name
-  
-    // Upload file to Supabase Storage
+    const timestamp = new Date().toISOString().replace(/[-:.]/g, ''); // Format date sebagai YYYYMMDDTHHMMSS
+    const fileName = `${timestamp}-${file.name}`; // Nama file baru
+
+    // Upload file ke Supabase Storage
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('avatars')
-      .upload(`${fileName}`, file); // Use the formatted file name
-    
+      .upload(`${fileName}`, file); // Menggunakan nama file yang diformat
+
     if (uploadError) {
       console.error('Error uploading avatar:', uploadError);
       throw new Error(`Failed to upload avatar: ${uploadError.message}`);
     }
-  
-    // Create a signed URL
+
+    // Membuat signed URL
     const { data: signedUrlData, error: signedUrlError } = await supabase.storage
       .from('avatars')
-      .createSignedUrl(uploadData.path, 60 * 60 * 24 * 365 * 10); // URL valid for 1 hour
-  
+      .createSignedUrl(uploadData?.path || '', 60 * 60 * 24 * 365 * 10); // URL valid untuk 1 jam
+
     if (signedUrlError) {
       console.error('Error creating signed URL:', signedUrlError);
       throw new Error(`Failed to create signed URL: ${signedUrlError.message}`);
     }
-  
-    return signedUrlData.signedUrl; // Return signed URL
+
+    return signedUrlData.signedUrl; // Mengembalikan signed URL
   };
 
-  
   const handleCreateUser = async () => {
     try {
-      // Validate avatar file
+      // Validasi file avatar
       if (avatar && (avatar.size > 2 * 1024 * 1024 || !['image/jpeg', 'image/png'].includes(avatar.type))) {
         setError('File must be a JPEG or PNG and less than 2MB');
         return;
       }
   
-      // Upload avatar if exists
+      // Upload avatar jika ada
       let avatarUrl = '';
       if (avatar) {
         avatarUrl = await uploadAvatar(avatar);
       }
   
-      // Create a new account in Supabase
+      // Membuat akun baru di Supabase
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -131,20 +121,18 @@ useEffect(() => {
       if (error) {
         setError(error.message);
       } else {
-        // Redirect to user page after successful creation
+        // Redirect ke halaman user setelah pembuatan berhasil
         router.push('/user');
       }
-    } catch (err) {
-      // Check if the error is an instance of Error
+    } catch (err: unknown) {
+      // Memastikan err adalah instance dari Error untuk menghindari masalah tipe
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        // Fallback error message
-        setError('An unexpected error occurred');
+        setError('An unknown error occurred');
       }
     }
   };
-  
   
 
   return (
@@ -226,7 +214,7 @@ useEffect(() => {
               {users.map((user) => (
                 <tr key={user.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <Image src={user.avatar_url} alt="Avatar" className="h-10 w-10 rounded-full" />
+                    <img src={user.avatar_url} alt="Avatar" className="h-10 w-10 rounded-full" />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">{user.full_name}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{user.email}</td>
@@ -239,9 +227,9 @@ useEffect(() => {
             </tbody>
           </table>
         </div>
-        <div className="mt-20"> {/* Margin above the footer */}
-        <Footer />
-      </div>
+        <div className="mt-20">
+          <Footer />
+        </div>
       </div>
     </div>
   );
