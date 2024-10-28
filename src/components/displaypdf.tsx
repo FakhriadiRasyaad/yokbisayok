@@ -22,14 +22,14 @@ const DisplayPDFs = () => {
 
       const { data, error: pdfError } = await supabase
         .from('profiles')
-        .select('doc_url') 
+        .select('document_url') 
         .eq('id', user.id) 
         .single(); 
 
       if (pdfError) {
         setError('Error fetching document');
       } else {
-        setPdfUrl(data?.doc_url || null);
+        setPdfUrl(data?.document_url || null);
       }
     };
 
@@ -45,10 +45,10 @@ const DisplayPDFs = () => {
         {error && <p className="text-red-500 mb-4">{error}</p>}
 
         {pdfUrl ? (
-          <div className="w-full overflow-hidden"> {/* Added overflow-hidden for better layout */}
+          <div className="w-full overflow-hidden"> 
             <embed
               src={pdfUrl}
-              className="w-full h-[600px] border rounded" // Set the width to full for maximum size
+              className="w-full h-[600px] border rounded" 
               title="User Document"
               type="application/pdf"
             />
