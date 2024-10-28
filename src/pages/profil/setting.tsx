@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import supabase from '../../components/SupabaseClient';
 import Navbar from '../../components/navbar';
 import Footer from '../../components/footer';
-import Image from 'next/image';
+// import Image from 'next/image';
 
 const SettingsPage = () => {
   const [fullName, setFullName] = useState('');
@@ -121,7 +121,7 @@ const SettingsPage = () => {
         
         {/* Avatar */}
         {avatar && (
-          <Image
+          <img
             src={avatar} 
             alt="Avatar" 
             className="h-36 w-36 rounded-full mb-6 border-2 border-gray-300 shadow-md" 

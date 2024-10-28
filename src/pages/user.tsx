@@ -6,7 +6,7 @@ import supabase from '../components/SupabaseClient';
 import Navbar from '../components/navbar';
 import Footer from '../components/footer';
 import AddUserIcon from '../assets/add.png';
-import Image from 'next/image';
+// import Image from 'next/image';
 
 // Definisikan tipe User
 type User = {
@@ -86,7 +86,7 @@ const UserPage = () => {
                     <tr key={index} className="hover:bg-gray-100 transition duration-200">
                       <td className="border px-4 py-2">
                         {user.avatar_url ? (
-                          <Image
+                          <img
                             src={user.avatar_url}
                             alt="avatar"
                             className="w-12 h-12 rounded-full"
@@ -113,7 +113,7 @@ const UserPage = () => {
             <button
               onClick={handleAdminButtonClick}
               className="bg-red-500 text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg hover:bg-red-800 transition duration-300 transform hover:scale-105">
-              <Image src={AddUserIcon.src} alt="Add User" className="w-10 h-10" /> {/* Use the imported image */}
+              <img src={AddUserIcon.src} alt="Add User" className="w-10 h-10" /> {/* Use the imported image */}
             </button>
           </div>
         )}
