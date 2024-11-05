@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Navbar from '../components/navbar';
-import Footer from '../components/footer';
 import Botpress from '../components/botpress';
 import logo from '../assets/standby.png';
 import DisplayPDFs from '../components/displaypdf';
@@ -155,7 +154,7 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </main>
-      <Footer />
+      
     </div>
   );
 };

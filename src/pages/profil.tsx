@@ -16,7 +16,7 @@ const ProfilPage = () => {
       const { data: { user }, error: userError } = await supabase.auth.getUser();
 
       if (userError || !user) {
-        router.push('/login'); // Redirect to login if not authenticated
+        router.push('/login'); 
       } else {
         const { data, error } = await supabase
           .from('profiles')
@@ -44,11 +44,11 @@ const ProfilPage = () => {
   };
 
   const handleSettings = () => {
-    router.push('/profil/setting'); // Redirect to settings page
+    router.push('/profil/setting'); 
   };
 
   const handleAboutUs = () => {
-    router.push('/profil/about'); // Redirect to About Us page
+    router.push('/profil/about'); 
   };
 
   return (

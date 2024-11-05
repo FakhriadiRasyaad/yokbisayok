@@ -113,7 +113,7 @@ const UserPage = () => {
             <button
               onClick={handleAdminButtonClick}
               className="bg-red-500 text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg hover:bg-red-800 transition duration-300 transform hover:scale-105">
-              <img src={AddUserIcon.src} alt="Add User" className="w-10 h-10" /> {/* Use the imported image */}
+              <img src={AddUserIcon.src} alt="Add User" className="w-10 h-10" /> 
             </button>
           </div>
         )}

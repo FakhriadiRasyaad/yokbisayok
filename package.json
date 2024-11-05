@@ -8,7 +8,6 @@
     "start": "next start",
     "lint": "next lint"
   },
-  
   "devDependencies": {
     "@supabase/supabase-js": "^2.45.4",
     "@types/node": "^20",
@@ -25,6 +24,7 @@
     "@types/chart.js": "^2.9.41",
     "autoprefixer": "^10.4.20",
     "chart.js": "^4.4.5",
+    "js-cookie": "^3.0.5",
     "next": "14.2.15",
     "react": "^18.3.1",
     "react-chartjs-2": "^5.2.0",
