@@ -4,8 +4,13 @@ import supabase from '../components/SupabaseClient';
 import { useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+<<<<<<< HEAD
 import logo from '../assets/standbyputih.png';
 import koran from '../assets/koran.png';
+=======
+import logo from '../assets/standby.png';
+import foto from '../assets/bayi.png';
+>>>>>>> 898840bf63a518a32377b2ca928c801d476a95f0
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -47,6 +52,7 @@ const LoginPage = () => {
     }
   };
 
+<<<<<<< HEAD
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible); 
   };
@@ -71,6 +77,41 @@ const LoginPage = () => {
             className="border border-gray-300 rounded-lg p-3 mb-4 w-full focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-300"
           />
           <div className="relative mb-4">
+=======
+  return (
+    <div className="flex flex-col min-h-screen bg-gray-100 relative">
+      <div 
+        className="absolute inset-0 bg-cover bg-center z-0"
+        style={{ backgroundImage: `url(${foto.src})` }}>
+      </div>
+
+      <nav className="bg-white shadow-md p-4 relative z-10">
+        <div className="container mx-auto flex justify-between items-center">
+          <div className="flex items-center">
+            <Image 
+              src={logo.src}
+              alt="Stanby Logo" 
+              className="h-8 w-8 mr-2" 
+            />
+            <h1 className="text-lg font-bold text-red-400">StandBy</h1>
+          </div>
+          <button 
+            onClick={() => setIsLoginVisible(!isLoginVisible)} 
+            className="text-red-500 hover:underline">
+            Login
+          </button>
+        </div>
+      </nav>
+      <div className="relative z-10 flex justify-center items-center flex-1">
+             <h1 className="text-4xl font-bold text-red-800">Selamat Datang!</h1>
+          </div>
+
+      {isLoginVisible && (
+        <div className="flex items-center justify-center flex-1 relative z-10">
+          <div className="bg-white shadow-md rounded-lg p-8 w-96">
+            <h2 className="text-3xl font-bold text-center text-red-800 mb-6">Login</h2>
+            {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+>>>>>>> 898840bf63a518a32377b2ca928c801d476a95f0
             <input
               type={isPasswordVisible ? 'text' : 'password'} 
               placeholder="Masukkan kata sandi Anda"
@@ -79,9 +120,14 @@ const LoginPage = () => {
               className="border border-gray-300 rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-300"
             />
             <button 
+<<<<<<< HEAD
               onClick={togglePasswordVisibility} 
               className="absolute right-3 top-3 text-gray-500 focus:outline-none"
               type="button"
+=======
+              onClick={handleLogin} 
+              className="bg-[#E3383A] text-white rounded-lg p-2 w-full hover:bg-red-700 transition duration-300"
+>>>>>>> 898840bf63a518a32377b2ca928c801d476a95f0
             >
               {isPasswordVisible ? (
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -101,9 +147,23 @@ const LoginPage = () => {
             Masuk
           </button>
         </div>
+<<<<<<< HEAD
+=======
+      )}
+
+     
+      <div className="relative z-10 p-8">
+        <h2>standbyincubator@gmail.com</h2>
+        <h2>standby123</h2>
+        <h2>fakhriadi06ras@gmail.com</h2>
+        <h2>qwerty12345</h2>
+>>>>>>> 898840bf63a518a32377b2ca928c801d476a95f0
       </div>
     </div>
   );
 }
 
 export default LoginPage;
+
+
+
