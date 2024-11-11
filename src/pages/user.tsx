@@ -5,10 +5,8 @@ import { useRouter } from 'next/navigation';
 import supabase from '../components/SupabaseClient';
 import Navbar from '../components/navbar';
 import Footer from '../components/footer';
-import AddUserIcon from '../assets/add.png';
-// import Image from 'next/image';
 
-// Definisikan tipe User
+
 type User = {
   id: string;
   full_name: string;
@@ -61,6 +59,9 @@ const UserPage = () => {
   const handleAdminButtonClick = () => {
     router.push('/user/useradmin');
   };
+  const handleAdminButtonClicks = () => {
+    router.push('/user/dokument');
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -112,8 +113,15 @@ const UserPage = () => {
           <div className="absolute top-4 right-4 flex items-center">
             <button
               onClick={handleAdminButtonClick}
-              className="bg-red-500 text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg hover:bg-red-800 transition duration-300 transform hover:scale-105">
-              <img src={AddUserIcon.src} alt="Add User" className="w-10 h-10" /> 
+              className="bg-blue-500 text-white px-4  mx-1 py-2 rounded"
+            >
+              <span className="text-base font-semibold">Tambahkan User</span>
+            </button>
+            <button
+              onClick={handleAdminButtonClicks}
+              className="bg-blue-500 text-white px-4 mx-1 py-2 rounded"
+            >
+              <span className="text-base font-semibold">Semua Dokumen</span>
             </button>
           </div>
         )}
