@@ -6,6 +6,8 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import logo from '../assets/standbyputih.png';
 import koran from '../assets/koran.png';
+import show from '../assets/show.png';
+import hide from '../assets/hide.png';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -61,7 +63,7 @@ const LoginPage = () => {
       </div>
       <div className="w-1/2 flex items-center justify-center bg-[#F7F7F7]">
         <div className="bg-white p-6 rounded shadow-md w-80">
-          <h2 className="text-lg font-semibold mb-4">Masuk Akun</h2>
+          <h2 className="text-black text-lg font-semibold mb-4">Masuk Akun</h2>
           {error && <p className="text-red-500 text-center mb-4">{error}</p>}
           <input
             type="text"
@@ -84,13 +86,9 @@ const LoginPage = () => {
               type="button"
             >
               {isPasswordVisible ? (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 12c0 4.418 3.582 8 8 8s8-3.582 8-8-3.582-8-8-8-8 3.582-8 8zm8 4v-4m0 0H7m4 0h4m-4 0V8" />
-                </svg>
+                <Image src={show} alt="Show password" className="h-5 w-5" />
               ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 12c0 1.5-.5 2-1 2s-1-.5-1-2 1-2 1-2 1 0 1 2zm-3-6c5 0 8 3 8 3s-3 3-8 3-8-3-8-3 3-3 8-3zM4.5 5.5l15 15" />
-                </svg>
+                <Image src={hide} alt="Hide password" className="h-5 w-5" />
               )}
             </button>
           </div>

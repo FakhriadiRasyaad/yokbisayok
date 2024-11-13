@@ -17,19 +17,18 @@ const Botpress: React.FC = () => {
       document.body.appendChild(configScript);
     };
 
-    // Memuat skrip hanya jika di halaman yang diinginkan
+
     if (router.pathname === '/home' || router.pathname === '/monitor') {
       loadBotpress();
     }
 
     return () => {
-      // Hapus skrip ketika berpindah halaman
       const scripts = document.querySelectorAll('script[src="https://cdn.botpress.cloud/webchat/v2.1/inject.js"], script[src="https://mediafiles.botpress.cloud/abf73d59-de68-4f12-993a-aafd25b94f9a/webchat/v2.1/config.js"]');
       scripts.forEach(script => script.remove());
     };
-  }, [router.pathname]); // Menambahkan router.pathname ke dalam dependency array
+  }, [router.pathname]);
 
-  return null; // Tidak mengembalikan JSX apapun
+  return null; 
 };
 
 export default Botpress;

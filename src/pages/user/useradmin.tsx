@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import supabase from '../../components/SupabaseClient';
 import Navbar from '../../components/navbar';
 import Footer from '../../components/footer';
-// import Image from 'next/image';
 
 type User = {
   id: string;
@@ -27,12 +26,11 @@ const CreateUserPage = () => {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  // Fungsi untuk memeriksa apakah user adalah admin
   useEffect(() => {
     const checkAdmin = async () => {
       const { data: { user }, error } = await supabase.auth.getUser();
       if (error || !user) {
-        router.push('/login'); // Redirect ke login jika tidak ada user
+        router.push('/login');
       } else {
         const { data } = await supabase
           .from('profiles')
@@ -40,7 +38,7 @@ const CreateUserPage = () => {
           .eq('id', user.id)
           .single();
         if (!data?.is_admin) {
-          router.push('/home'); // Redirect jika user bukan admin
+          router.push('/home');
         }
       }
     };
@@ -48,7 +46,6 @@ const CreateUserPage = () => {
     checkAdmin();
   }, [router]);
 
-  // Mengambil daftar user dari database
   useEffect(() => {
     const fetchUsers = async () => {
       const { data, error } = await supabase.from('profiles').select('*');
@@ -63,47 +60,42 @@ const CreateUserPage = () => {
   }, []);
 
   const uploadAvatar = async (file: File) => {
-    const timestamp = new Date().toISOString().replace(/[-:.]/g, ''); // Format date sebagai YYYYMMDDTHHMMSS
-    const fileName = `${timestamp}-${file.name}`; // Nama file baru
+    const timestamp = new Date().toISOString().replace(/[-:.]/g, '');
+    const fileName = `${timestamp}-${file.name}`;
 
-    // Upload file ke Supabase Storage
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('avatars')
-      .upload(`${fileName}`, file); // Menggunakan nama file yang diformat
+      .upload(`${fileName}`, file);
 
     if (uploadError) {
       console.error('Error uploading avatar:', uploadError);
       throw new Error(`Failed to upload avatar: ${uploadError.message}`);
     }
 
-    // Membuat signed URL
     const { data: signedUrlData, error: signedUrlError } = await supabase.storage
       .from('avatars')
-      .createSignedUrl(uploadData?.path || '', 60 * 60 * 24 * 365 * 10); // URL valid untuk 1 jam
+      .createSignedUrl(uploadData?.path || '', 60 * 60 * 24 * 365 * 10);
 
     if (signedUrlError) {
       console.error('Error creating signed URL:', signedUrlError);
       throw new Error(`Failed to create signed URL: ${signedUrlError.message}`);
     }
 
-    return signedUrlData.signedUrl; // Mengembalikan signed URL
+    return signedUrlData.signedUrl;
   };
 
   const handleCreateUser = async () => {
     try {
-      // Validasi file avatar
       if (avatar && (avatar.size > 2 * 1024 * 1024 || !['image/jpeg', 'image/png'].includes(avatar.type))) {
         setError('File must be a JPEG or PNG and less than 2MB');
         return;
       }
-  
-      // Upload avatar jika ada
+
       let avatarUrl = '';
       if (avatar) {
         avatarUrl = await uploadAvatar(avatar);
       }
-  
-      // Membuat akun baru di Supabase
+
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -117,15 +109,13 @@ const CreateUserPage = () => {
           },
         },
       });
-  
+
       if (error) {
         setError(error.message);
       } else {
-        // Redirect ke halaman user setelah pembuatan berhasil
         router.push('/user');
       }
     } catch (err: unknown) {
-      // Memastikan err adalah instance dari Error untuk menghindari masalah tipe
       if (err instanceof Error) {
         setError(err.message);
       } else {
@@ -133,7 +123,6 @@ const CreateUserPage = () => {
       }
     }
   };
-  
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -180,15 +169,28 @@ const CreateUserPage = () => {
             className="mb-4"
           />
 
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              checked={isAdmin}
-              onChange={(e) => setIsAdmin(e.target.checked)}
-              className="mr-2"
-            />
-            Admin
-          </label>
+          <div className="flex space-x-4">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                value="admin"
+                checked={isAdmin === true}
+                onChange={() => setIsAdmin(true)}
+                className="mr-2"
+              />
+              Admin
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                value="staff"
+                checked={isAdmin === false}
+                onChange={() => setIsAdmin(false)}
+                className="mr-2"
+              />
+              Staff
+            </label>
+          </div>
 
           <button
             onClick={handleCreateUser}

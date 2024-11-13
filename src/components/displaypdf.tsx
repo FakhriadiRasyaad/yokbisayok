@@ -40,7 +40,7 @@ const DisplayPDFs = () => {
     <div className="flex flex-col min-h-screen bg-gray-50">
 
       <div className="flex flex-col items-center justify-center flex-1 p-8">
-        <h1 className="text-3xl font-bold mb-6">Document</h1>
+        <h1 className="text-3xl font-bold mb-6">Dokumen Lapangan</h1>
 
         {error && <p className="text-red-500 mb-4">{error}</p>}
 

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import supabase from '../components/SupabaseClient';
 import Navbar from '../components/navbar';
 import Footer from '../components/footer';
+import Pagination from '../components/pagination';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 
@@ -138,38 +139,10 @@ const Esp32Dashboard: React.FC = () => {
   };
 
 
-  const convertToCSV = (jsonData: SensorData[]) => {
-    const headers = ['Created at', 'DS18B20 Temp1 (°C)', 'DS18B20 Temp2 (°C)', 'DS18B20 Temp3 (°C)', 'DS18B20 Temp4 (°C)', 'DHT22 Temp (°C)', 'DHT22 Humidity (%)', 'Fan Status', 'Sound Detected', 'Flow Rate'];
-    const csvRows = [headers.join(',')];
+ 
 
-    jsonData.forEach((item) => {
-      const row = [
-        item.created_at,
-        item.ds18b20_temp1,
-        item.ds18b20_temp2,
-        item.ds18b20_temp3,
-        item.ds18b20_temp4,
-        item.dht22_temp,
-        item.dht22_humi,
-        item.fan_status,
-        item.sound_detected,
-        item.flow_rate,
-      ];
-      csvRows.push(row.join(','));
-    });
-
-    return csvRows.join('\n');
-  };
-
-  const downloadCSV = () => {
-    const csv = convertToCSV(data);
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.setAttribute('href', url);
-    a.setAttribute('download', 'esp32_data.csv');
-    a.click();
-  };
+   
+ 
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -244,54 +217,10 @@ const Esp32Dashboard: React.FC = () => {
               <Bar data={chartDatas} options={{ responsive: true, maintainAspectRatio: false }} />
             </div>
           </div>
-
-
-
-          <div className="bg-white shadow-lg rounded-lg p-6">
-            <h3 className="text-xl font-semibold mb-4">Data Table</h3>
-            <div className="overflow-x-auto">
-            <button
-              className="mt-4 bg-green-500 text-white px-4 py-2 rounded"
-              onClick={downloadCSV}>
-              Download CSV
-            </button>
-            <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-100">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created at</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DS18B20 Temp1</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DS18B20 Temp2</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DS18B20 Temp3</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DS18B20 Temp4</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DHT22 Temp</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DHT22 Humidity</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fan Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sound Detected</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Flow Rate</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {data.map((item) => (
-                    <tr key={item.created_at}>
-                      <td className="px-6 py-4 whitespace-nowrap">{item.created_at}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">{item.ds18b20_temp1}°C</td>
-                      <td className="px-6 py-4 whitespace-nowrap">{item.ds18b20_temp2}°C</td>
-                      <td className="px-6 py-4 whitespace-nowrap">{item.ds18b20_temp3}°C</td>
-                      <td className="px-6 py-4 whitespace-nowrap">{item.ds18b20_temp4}°C</td>
-                      <td className="px-6 py-4 whitespace-nowrap">{item.dht22_temp}°C</td>
-                      <td className="px-6 py-4 whitespace-nowrap">{item.dht22_humi}%</td>
-                      <td className="px-6 py-4 whitespace-nowrap">{item.fan_status}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">{item.sound_detected}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">{item.flow_rate}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <Pagination/>
             </div>
           </div>
         </div>
-       </div>
-    </div>
   <Footer />
 </div>
   );

@@ -13,15 +13,7 @@ const AboutUs: React.FC = () => {
         <p className="text-lg text-center mb-10">
           Lorem kepsum terkesum kesum
           </p>
-        <h2 className="text-3xl font-semibold text-center mb-6">Our Mission</h2>
-        <p className="text-lg text-center mb-10">
-        Lorem kepsum terkesum kesum
-        </p>
-
-        <h2 className="text-3xl font-semibold text-center mb-6">Our Vision</h2>
-        <p className="text-lg text-center mb-10">
-        Lorem kepsum terkesum kesum
-        </p>
+        
 
         <h2 className="text-3xl font-semibold text-center mb-6">Meet Our Team</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
