@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '../../components/navbar';
 import supabase from '../../components/SupabaseClient';
-import html2pdf from 'html2pdf.js';
 
 
 const HomePage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);const [isClient, setIsClient] = useState(false);
+  useEffect(() => {
+    setIsClient(true); // Now the component knows it's running on the client
+  }, []);
 
   const [tableData1, setTableData1] = useState(
     Array.from({ length: 18 }, () => Array(2).fill(''))
@@ -81,7 +83,11 @@ const HomePage: React.FC = () => {
   };
 
   const savePageToDatabase = async () => {
+    if (!isClient) return; // Prevent execution on the server
+  
     try {
+      const html2pdf = (await import('html2pdf.js')).default; // Dynamic import on client side only
+  
       const pageContent = document.getElementById('printableArea');
       if (!pageContent) {
         setError('No content to save');
@@ -91,24 +97,23 @@ const HomePage: React.FC = () => {
       const timestamp = new Date().toISOString().replace(/[-:.]/g, '');
       const fileName = `report-${timestamp}.pdf`;
   
-      // Generate the PDF as a Blob
-      const pdfBlob = (await html2pdf()
+      // Generate the PDF as a blob
+      const pdfBlob = await html2pdf()
         .set({
           filename: fileName,
           html2canvas: { scale: 2 },
           jsPDF: { format: 'a4', orientation: 'portrait' },
         })
         .from(pageContent)
-        .output('blob')) as Blob; // Cast as Blob here
+        .output('blob');
   
-      // Upload the Blob to Supabase Storage
+      // Cast pdfBlob as Blob to avoid the 'unknown' error
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('documents')
-        .upload(fileName, pdfBlob);
+        .upload(fileName, pdfBlob as Blob);
   
       if (uploadError) throw new Error(`Failed to upload PDF: ${uploadError.message}`);
   
-      // Generate signed URL for the PDF
       const { data: signedUrlData, error: signedUrlError } = await supabase.storage
         .from('documents')
         .createSignedUrl(uploadData.path, 60 * 60 * 24);
@@ -117,11 +122,9 @@ const HomePage: React.FC = () => {
   
       const documentUrl = signedUrlData.signedUrl;
   
-      // Get authenticated user
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       if (userError || !user) throw new Error('User not found or not authenticated');
   
-      // Update user's profile with the new PDF document URL
       const { error: profileError } = await supabase
         .from('profiles')
         .update({ document2_url: documentUrl })
@@ -140,6 +143,7 @@ const HomePage: React.FC = () => {
       setMessage('');
     }
   };
+  
   
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
@@ -325,4 +329,3 @@ const HomePage: React.FC = () => {
 };
 
 export default HomePage;
-
